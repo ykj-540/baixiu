@@ -1,0 +1,352 @@
+<%- include('./layouts/header.ejs')%>
+
+  <div class="main">
+    <%- include('./layouts/navBar.ejs')%>
+    <div class="container-fluid">
+      <div class="page-title">
+        <h1>用户</h1>
+      </div>
+      <!-- 有错误信息时展示 -->
+      <!-- <div class="alert alert-danger">
+        <strong>错误！</strong>发生XXX错误
+      </div> -->
+      <div class="row">
+        <div class="col-md-4">
+          <form id="myForm">
+            <h2>添加新用户</h2>
+            <div class="form-group">
+              <label for="email">邮箱</label>
+              <input id="email" class="form-control" name="email" type="email" placeholder="邮箱">
+            </div>
+            <div class="form-group">
+              <label for="slug">别名</label>
+              <input id="slug" class="form-control" name="slug" type="text" placeholder="slug">
+              <p class="help-block">https://zce.me/author/<strong>slug</strong></p>
+            </div>
+            <div class="form-group">
+              <label for="nickname">昵称</label>
+              <input id="nickname" class="form-control" name="nickname" type="text" placeholder="昵称">
+            </div>
+            <div class="form-group">
+              <label for="password">密码</label>
+              <input id="password" class="form-control" name="password" type="text" placeholder="密码">
+            </div>
+            <div class="form-group">
+              <!-- <button class="btn btn-primary" type="submit">添加</button> -->
+              <!-- 将之前的button按钮改成如下input标签,目的是阻止form表单的默认提交行为 -->
+              <input type="button" value="添加" id="btnAdd" class="btn btn-primary">
+            </div>
+          </form>
+        </div>
+        <div class="col-md-8">
+          <div class="page-action">
+            <!-- show when multiple checked -->
+            <a class="btn btn-danger btn-sm" href="javascript:;" id="delMore" style="display: none">批量删除</a>
+          </div>
+          <table class="table table-striped table-bordered table-hover">
+            <thead>
+               <tr>
+                <th class="text-center" width="40"><input type="checkbox" id="chkToggle"></th>
+                <th class="text-center" width="80">头像</th>
+                <th>邮箱</th>
+                <th>别名</th>
+                <th>昵称</th>
+                <th>状态</th>
+                <th class="text-center" width="100">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% list.forEach(item=>{%>
+              <tr>
+                <td class="text-center"><input type="checkbox" data-id="<%= item.id%>" class="chkDel"></td>
+                <td class="text-center"><img class="avatar" src="<%= item.avatar%>"></td>
+                <td><%= item.email%></td>
+                <td><%= item.slug%></td>
+                <td><%= item.nickname%></td>
+                <% if(item.status=='activated'){%>
+                 <td>激活</td>
+                <%}else if(item.status=='unactivated'){%>
+                  <td>未激活</td>
+                <%}else if(item.status=='forbidden'){%>
+                  <td>禁止</td>
+                 <%}else {%>
+                    <td>回收</td>
+                <%}%>
+                <td class="text-center">
+                  <a href="/editUserInfo?id=<%= item.id%>" class="btnEdit btn btn-default btn-xs">编辑</a>
+                  <a href="/delUser?id=<%= item.id%>" class="btnDel btn btn-danger btn-xs">删除</a>
+                </td>
+              </tr>
+             <% })%>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%- include('./layouts/aside.ejs')%>
+
+  <%- include('./layouts/footer.ejs')%>
+  <!-- 此模板是右侧用户列表的模板 -->
+  <script type='text/template' id="userListTmp">
+    {{each data as item key}}
+      <tr>
+        <td class="text-center"><input type="checkbox" data-id="{{item.id}}" class="chkDel"></td>
+        <td class="text-center"><img class="avatar" src="{{item.avatar}} "></td>
+        <td>{{ item.email}}</td>
+        <td>{{ item.slug }}</td>
+        <td>{{ item.nickname }}</td>
+        {{ if item.status=='activated' }}
+          <td>激活</td>
+          {{else if item.status=='unactivated'  }}
+            <td>未激活</td>
+          {{else if item.status=='forbidden'}}
+           <td>禁用</td>
+          {{else}}
+        {{/if}}
+        <td class="text-center">
+          <a href="/editUserInfo?id={{item.id}}" class="btnEdit btn btn-default btn-xs">编辑</a>
+          <a href="/delUser?id={{item.id}}" class="btnDel btn btn-danger btn-xs">删除</a>
+        </td>
+      </tr>
+    {{/each}}
+  </script>
+
+  <!-- 此处是左侧的编辑时的模板 -->
+  <script type="text/template" id="userInfoTmp">
+    <h2>编辑用户</h2>
+    <input type="hidden" value="{{id}}" name="id">
+            <div class="form-group">
+              <label for="email">邮箱</label>
+              <input id="email" class="form-control" value="{{email}}" name="email" type="email" placeholder="邮箱">
+            </div>
+            <div class="form-group">
+              <label for="slug">别名</label>
+              <input id="slug" class="form-control" value="{{slug}}" name="slug" type="text" placeholder="slug">
+              <p class="help-block">https://zce.me/author/<strong>slug</strong></p>
+            </div>
+            <div class="form-group">
+              <label for="nickname">昵称</label>
+              <input id="nickname" class="form-control" value="{{nickname}}" name="nickname" type="text" placeholder="昵称">
+            </div>
+           
+            <div class="form-group">
+              <!-- <button class="btn btn-primary" type="submit">添加</button> -->
+              <!-- 将之前的button按钮改成如下input标签,目的是阻止form表单的默认提交行为 -->
+              <input type="button" value="更新" id="btnEdit" class="btn btn-primary">
+            </div>
+  </script>
+
+  <!-- 此处是左侧的页面结构模板 -->
+  <script type='text/template' id="userLeftTmp">
+    <h2>添加新用户</h2>
+            <div class="form-group">
+              <label for="email">邮箱</label>
+              <input id="email" class="form-control" name="email" type="email" placeholder="邮箱">
+            </div>
+            <div class="form-group">
+              <label for="slug">别名</label>
+              <input id="slug" class="form-control" name="slug" type="text" placeholder="slug">
+              <p class="help-block">https://zce.me/author/<strong>slug</strong></p>
+            </div>
+            <div class="form-group">
+              <label for="nickname">昵称</label>
+              <input id="nickname" class="form-control" name="nickname" type="text" placeholder="昵称">
+            </div>
+            <div class="form-group">
+              <label for="password">密码</label>
+              <input id="password" class="form-control" name="password" type="text" placeholder="密码">
+            </div>
+            <div class="form-group">
+              <!-- <button class="btn btn-primary" type="submit">添加</button> -->
+              <!-- 将之前的button按钮改成如下input标签,目的是阻止form表单的默认提交行为 -->
+              <input type="button" value="添加" id="btnAdd" class="btn btn-primary">
+            </div>
+  </script>
+<script>
+  // 1. 添加用户 给单击按钮注册事件
+  // $('#btnAdd').on('click',function(){
+  $('#myForm').on('click','#btnAdd',function(){
+
+    // 2. 发送ajax请求
+    $.ajax({
+      type:'post',
+      url:'/usersAdd',
+      data: $('#myForm').serialize(),// 表单序列化可以一次性获取form表单中带有name属性的input标签的值,拼接成"email=aa@qq.com&slug=aa&nickname=mm&password=123"
+      dataType:'json', // 告诉ajax底部将后端传递过来的json形式的字符串转换成json对象
+      success:function(res){
+        console.log(res);
+        if(res&&res.code==1){
+          var htmlStr = template('userListTmp',res)
+          $('tbody').html(htmlStr)
+
+          // 清空页面中的表单的值
+          $('#myForm input[name]').val('')
+
+          clickHandler();// 调用函数重新给每一个小按钮注册事件
+        }
+      }
+    })
+  })
+  
+  
+  // 删除用户
+  // 1. 注册事件
+  // $('.btnDel').on('click',function(e){
+  $('tbody').on('click','.btnDel',function(e){ // 通过委托的方式注册
+    // return false;
+    e.preventDefault();
+    // alert(123)
+    // 2. 发送ajax 请求
+    $.ajax({
+      type:'get',
+      url:$(this).attr('href'),
+      dataType:'json',// 将后台传递过来的json形式的字符串转换成对象
+      success:function(res){
+        console.log(res);
+        if(res&&res.code==1){
+          var htmlStr = template('userListTmp',res);
+          $('tbody').html(htmlStr);
+
+          clickHandler();// 调用函数重新给每一个小按钮注册事件
+        }
+      }
+    })
+  })
+  
+
+  // 编辑用户之显示用户数据  一定要注意，使用委托的方式，给父标签tbody注册事件,让子元素来触发
+  // 1. 注册事件  获取用户信息
+  $('tbody').on('click','.btnEdit',function (e) {
+    e.preventDefault();// 阻止浏览器的默认跳转行为
+    // alert(123)
+    // 2. 发送ajax
+    $.ajax({
+      type:'get',
+      url:$(this).attr('href'),
+      dataType:'json',// 让ajax 底层将服务器响应回来的字符串转换成json对象
+      success:function(res){
+        console.log(res);
+        if(res&&res.code==0){
+          // 准备模板 字符串
+          var htmlStr = template('userInfoTmp',res.data[0]);// 第二个参数必须是要渲染的数据的对象 一定要是数据所在的当前对象
+          $('#myForm').html(htmlStr)
+
+          
+        }
+      }
+    })
+  })
+  
+  // 更新数据  给更新按钮注册事件
+  // 1. 注册事件
+  $('#myForm').on('click','#btnEdit',function(){
+    // alert(45678)
+
+    // 2. 发送请求
+    $.ajax({
+      type:'post',
+      url:'/updateUserInfo',
+      data:$('#myForm').serialize(),// 使用表单序列化的方式一次性获取表单中所有的具有name属性的input标签的值
+      // "id=14&email=mmm@mm.com&slug=mm&nickname=mm&password=123"
+      dataType:'json',
+      success:function(res){
+        // console.log(res);
+        // 接收后端响应回来的数据,渲染页面
+        var htmlStr = template('userListTmp',res)
+        $('tbody').html(htmlStr)
+
+        // location.href='/users' // 跳转回当前主页面
+        // 让左侧重新恢复为原来的添加状态
+        var htmlStr1 = template('userLeftTmp',{})
+        $('#myForm').html(htmlStr1)
+
+        
+      }
+    })
+  })
+  
+  // 全选 ,全不选 
+  $('#chkToggle').on('click',function () {
+    // 所谓选中,其实就相当于是checkbox里面有一个属性checked，在js里面是有一个boolean，是true
+    var flag = $(this).prop('checked'); // checked  selected  disabled 必须  property 
+    // console.log(flag);
+    // if(flag){
+    //   // $('.chkDel').prop('checked',true)
+    //   $('.chkDel').prop('checked',flag)
+    // }else {
+    //   // $('.chkDel').prop('checked', false)
+    //   $('.chkDel').prop('checked', flag)
+    // }
+    $('.chkDel').prop('checked', flag);// 简写成这样的
+    // 让批量删除按钮显示或是隐藏
+    // if(flag){
+    //   $('#delMore').show('fast');
+    // }else {
+    //   $('#delMore').hide('normal');
+    // }
+    // 可以改写成如下的三元表达式
+    flag? $('#delMore').show('fast'): $('#delMore').hide('normal');
+  })
+
+  // 给每一个小按钮注册事件,当小按钮的选中个数>=2的时候，要让批量删除按钮显示出来,当所有的小按钮都选中的时候，让总的小按钮也要被选 中
+  clickHandler();// 
+ function clickHandler(){
+    $('.chkDel').on('click', function () {
+     var count = $('.chkDel').size();// 获取所有的小按钮元素个数
+     // console.log(count);
+
+     var num = $('.chkDel:checked').size();// 获取被选中的小按钮的个数
+     num >= 2 ? $('#delMore').show('fast') : $('#delMore').hide('normal');
+
+     // 判断总的小按钮选中与否
+     num == count ? $('#chkToggle').prop('checked', true) : $('#chkToggle').prop('checked', false)
+   })
+ }
+  
+  // 批量删除数据
+  // 1. 注册事件
+  $('#delMore').on('click',function (e) {
+    e.preventDefault();
+    // alert(112233)
+    var ids = []
+    $('.chkDel:checked').each(function(key,ele){
+      // ele是DOM对象
+      ids.push($(ele).attr('data-id'))
+    })
+    console.log(ids);
+   // 2. 发送ajax请求
+   $.ajax({
+     type:'post',
+     url:'/delMoreUsers',
+     data:{
+       ids:ids
+     },
+     dataType:'json',
+     success:function(res){
+       console.log(res);
+      if(res&&res.code==0){
+        var htmlStr = template('userListTmp',res)
+        $('tbody').html(htmlStr)
+
+        // 让批量删除按钮再隐藏起来
+        $('#delMore').hide('normal')
+      }
+     }
+   })
+  })
+  /**
+   * 使用art-template的步骤
+   * 1. 引入art-template文件
+   * 2. 准备模板
+   * 3. 调用template方法,生成模板字符串
+   * 4. 渲染数据
+   * 
+   * 
+   * 使用模板渲染数据,相当于是动态创建元素,简单事件注册对于动态创建出来的事件不起作用
+   * 使用原来的方式注册事件不起作用,因为你先注册事件，而后又重新渲染的模板，相当于是重新动态生成的数据
+   * 
+   * {id:10,foo:"abc",data:[{id:1,name:'tom',gender:'男'}]}
+   */
+</script>
